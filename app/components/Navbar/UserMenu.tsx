@@ -5,12 +5,21 @@ import Avatar from '../Avatar';
 import { useCallback, useState } from 'react';
 import MenuItem from './MenuItem';
 import useRegisterModal from '@/app/hooks/useRegisterModals';
-function UserMenu() {
+import useLoginModal from '@/app/hooks/useLoginModals';
+
+import { signOut } from 'next-auth/react';
+import { SafeUser } from '@/app/types';
+export interface UserMenuProps {
+  currentUser?: SafeUser | null;
+}
+function UserMenu({ currentUser }: UserMenuProps) {
   const registerModal = useRegisterModal();
+  const loginModal = useLoginModal();
   const [isOpen, setIsOpen] = useState(false);
   const toggleOpen = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
+  console.log(currentUser);
   return (
     <div className='relative '>
       <div className='flex flex-row items-center gap-3 '>
@@ -33,8 +42,22 @@ function UserMenu() {
       {isOpen && (
         <div className=' absolute rounded-xl shadow-md w-[40vw] md:w-3/4 overflow-hidden right-0 top-12 text-sm bg-white'>
           <div className='flex flex-col cursor-pointer '>
-            <MenuItem onClick={() => {}} label='login' />
-            <MenuItem onClick={registerModal.onOpen} label='sign up' />
+            {currentUser ? (
+              <>
+                <MenuItem onClick={() => {}} label='My trips' />
+                <MenuItem onClick={() => {}} label='My favorites' />
+                <MenuItem onClick={() => {}} label='My reservations' />
+                <MenuItem onClick={() => {}} label='My properties' />
+                <MenuItem onClick={() => {}} label='Airbnb my home' />
+                <hr />
+                <MenuItem onClick={() => signOut()} label='logout' />
+              </>
+            ) : (
+              <>
+                <MenuItem onClick={loginModal.onOpen} label='login' />
+                <MenuItem onClick={registerModal.onOpen} label='sign up' />
+              </>
+            )}
           </div>
         </div>
       )}
